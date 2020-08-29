@@ -3,11 +3,24 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
+function maskEmail(email) {
+    function mask(str) {
+        if (str.length > 4) {
+            return str.substr(0, 1) + str.substr(1, str.length - 1).replace(/\w/g, '*') + str.substr(-1, 1);
+        }
+        return str.replace(/\w/g, '*');
+    }
+    return email.replace(/([\w.]+)@([\w.]+)(\.[\w.]+)/g, function (m, p1, p2, p3) {
+        return mask(p1) + '@' + mask(p2) + p3;
+    })
+    return email;
+}
+
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10) // algorithme de hash bcrypt sur 10 tours
         .then(hash => {
             const user = new User({ // crée un nouvel utilisateur
-                email: req.body.email,
+                email: maskEmail(req.body.email),
                 password: hash // récupère le mdp hashé de la fonction au-dessus
             });
             user.save()
@@ -19,7 +32,7 @@ exports.signup = (req, res, next) => {
 }
 
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: maskEmail(req.body.email) })
         .then(user => {
             if (!user) { // Si aucun utilisateur de la BDD ne correspond à cet utilisateur
                 return res.status(401).json({ error: 'Utilisateur non trouvé !' });
