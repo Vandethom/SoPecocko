@@ -1,9 +1,46 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const sanitize = require('mongo-sanitize');
 
 const User = require('../models/user');
 
-function maskEmail(email) {
+/* -------------------- Authorized and LoggedIn Middlewares -------------------- */
+
+const { roles } = require('../roles');
+
+exports.grantAccess = function (action, resource) {
+    return async (req, res, next) => {
+        try {
+            const permission = roles.can(req.user.role)[deleteAny](sauce);
+            if (!permission.granted) {
+                return res.status(401).json({
+                    error: 'You\'re not allowed to do this'
+                });
+            }
+            next()
+        } catch (error) {
+            next(error)
+        }
+    }
+};
+
+exports.allowIfAccessGranted = async (req, res, next) => {
+    try {
+        const user = res.locals.loggedInUser;
+        if (!user)
+            return res.status(401).json({
+                error: "You need to be logged in to access this route"
+            });
+        req.user = user;
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+/* -------------------- Masquage de l'email -------------------- */
+
+function maskEmail(email) { // Fonction exploitée dans 'signup' et donc 'login' pour remplacer par *** les Strings en BDD
     function mask(str) {
         if (str.length > 4) {
             return str.substr(0, 1) + str.substr(1, str.length - 1).replace(/\w/g, '*') + str.substr(-1, 1);
@@ -16,15 +53,18 @@ function maskEmail(email) {
     return email;
 }
 
+/* -------------------- Controllers -------------------- */
+
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10) // algorithme de hash bcrypt sur 10 tours
         .then(hash => {
             const user = new User({ // crée un nouvel utilisateur
-                email: maskEmail(req.body.email),
-                password: hash // récupère le mdp hashé de la fonction au-dessus
+                email: maskEmail(sanitize(req.body.email)),
+                password: sanitize(hash) // récupère le mdp hashé de la fonction au-dessus
             });
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur Créé !' }))
+                .then(res.json({}))
                 .catch(error => res.status(400).json({ error }))
         })
         .catch(error => res.status(500).json({ error }))
@@ -51,6 +91,7 @@ exports.login = (req, res, next) => {
                         )
                     });
                 })
+                .then(() => res.json({ token }))
                 .catch(error => res.status(500).json({ error }));
         })
         .catch(error => res.status(500).json({ error }));

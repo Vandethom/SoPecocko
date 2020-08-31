@@ -17,9 +17,11 @@ const userSchema = mongoose.Schema({
     role: {
         type: String,
         default: "basic",
-        enum: ["basic", "supervisor", "admin"]
+        enum: ["basic", "admin"]
     },
-    accessToken: { type: String }
+    accessToken: {
+        type: String
+    }
 });
 
 userSchema.plugin(uniqueValidator);
