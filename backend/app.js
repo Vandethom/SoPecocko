@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
+require('dotenv').config()
+
 /* ------------------------------ Routes ------------------------------ */
 
 const sauceRoutes = require('./routes/sauces');
@@ -15,7 +17,7 @@ const app = express();
 
 /* ------------------------------ Server Connexion ------------------------------ */
 
-mongoose.connect('mongodb+srv://Vonloth:Nogotheg7@cluster0-8vf0g.gcp.mongodb.net/SoPekocko?retryWrites=true&w=majority',
+mongoose.connect(process.env.mongoDBUrl,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
