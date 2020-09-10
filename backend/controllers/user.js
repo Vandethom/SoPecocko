@@ -6,9 +6,9 @@ const User = require("../models/user");
 
 /* -------------------- Authorized and LoggedIn Middlewares -------------------- */
 
-const { roles } = require("../roles");
+// const { roles } = require("../roles");
 
-exports.grantAccess = function (action, resource) {
+/*exports.grantAccess = function (action, resource) {
   return async (req, res, next) => {
     try {
       const permission = roles.can(req.user.role)[deleteAny](sauce);
@@ -36,7 +36,7 @@ exports.allowIfAccessGranted = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+};*/
 
 /* -------------------- Masquage de l'email -------------------- */
 
