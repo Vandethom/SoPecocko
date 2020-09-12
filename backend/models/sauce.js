@@ -33,10 +33,10 @@ const sauceSchema = mongoose.Schema({
         type: Number
     },
     usersLiked: {
-        type: String
+        type: [String]
     },
     usersDisliked: {
-        type: String
+        type: [String]
     }
 });
 
