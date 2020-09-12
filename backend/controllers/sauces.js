@@ -90,7 +90,7 @@ exports.likeSauce = (req, res, next) => {
         Sauce.findOne({ _id: sauceId })
             .then((sauce) => {
                 console.log(sauce)
-                if (sauce.usersLiked.includes(userId)) { //ça bug
+                if (sauce.usersLiked.includes(userId)) {
                     Sauce.updateOne({ _id: req.params.id },
                         {
                             $inc: { likes: -1 },
