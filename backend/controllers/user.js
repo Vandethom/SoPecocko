@@ -69,8 +69,7 @@ exports.signup = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10) // algorithme de hash bcrypt sur 10 tours
     .then((hash) => {
-      const user = new User({
-        // crée un nouvel utilisateur
+      const user = new User({ // crée un nouvel utilisateur        
         email: maskEmail(sanitize(req.body.email)),
         password: sanitize(hash), // récupère le mdp hashé de la fonction au-dessus
       });
@@ -89,8 +88,7 @@ exports.signup = (req, res, next) => {
 exports.login = (req, res, next) => {
   User.findOne({ email: maskEmail(req.body.email) })
     .then((user) => {
-      if (!user) {
-        // Si aucun utilisateur de la BDD ne correspond à cet utilisateur
+      if (!user) { // Si aucun utilisateur de la BDD ne correspond à cet utilisateur        
         return res.status(401).json({ error: "Utilisateur non trouvé !" });
       }
       bcrypt
@@ -102,7 +100,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", { // Token à stocker dans .env hors environnement de travail
               expiresIn: "24h",
             }),
           });
